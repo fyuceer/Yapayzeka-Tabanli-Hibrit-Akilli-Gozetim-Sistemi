@@ -1,4 +1,4 @@
-# Yapay Zekâ Tabanlı Hibrit Akıllı Gözetim Sistemi
+# 🧠 Yapay Zekâ Tabanlı Hibrit Akıllı Gözetim Sistemi
 
 ### TÜBİTAK 2209-A Destekli Bitirme Projesi
 
@@ -10,7 +10,7 @@ Gerçek zamanlı güvenlik kamerası görüntülerini analiz ederek tehlikeli ne
 
 ---
 
-## 📌 Proje Hakkında
+##  Proje Hakkında
 
 Geleneksel güvenlik sistemleri çoğunlukla kamera görüntülerinin insan operatörler tarafından sürekli izlenmesine dayanır. Bu yaklaşım, uzun süreli izleme sırasında dikkat kaybına ve kritik olayların geç fark edilmesine neden olabilir.
 
@@ -20,7 +20,7 @@ Sistem, nesne tespiti ve davranış analizi modüllerini bir araya getirir. Pyth
 
 Proje, **TÜBİTAK 2209-A Üniversite Öğrencileri Araştırma Projeleri Destekleme Programı** kapsamında desteklenmiştir.
 
-## 🎯 Projenin Amaçları
+##  Projenin Amaçları
 
 * Güvenlik kamerası görüntülerinden tehlikeli nesneleri tespit etmek.
 * İnsanların iskelet ve hareket bilgilerini analiz ederek saldırı davranışlarını sınıflandırmak.
@@ -29,7 +29,7 @@ Proje, **TÜBİTAK 2209-A Üniversite Öğrencileri Araştırma Projeleri Destek
 * Güvenlik operatörlerinin olayları daha hızlı değerlendirmesine yardımcı olmak.
 * İnsan gözetimine duyulan bağımlılığı azaltmaya yönelik bir prototip geliştirmek.
 
-## 🧠 Sistem Mimarisi
+##  Sistem Mimarisi
 
 Sistem iki temel yapay zekâ modülünden ve bu modüllerle iletişim kuran bir yazılım altyapısından oluşur.
 
@@ -73,7 +73,7 @@ Sistem iki temel yapay zekâ modülünden ve bu modüllerle iletişim kuran bir 
 
 *Not: Diyagram, sistemin kavramsal işleyişini göstermektedir. Gerçek çalışma akışı, uygulamadaki entegrasyon ve tehdit değerlendirme mantığına bağlıdır.*
 
-## 🔍 Temel Modüller
+##  Temel Modüller
 
 ### 1. Tehlikeli Nesne Tespiti
 
@@ -139,7 +139,7 @@ Backend, kamera görüntülerini işleyerek tespit sonuçlarını üretir ve Web
 
 Arayüzde tehdit bilgileri, olay kayıtları ve sistem durumunun görselleştirilmesi hedeflenmiştir.
 
-## 📊 Deneysel Sonuçlar
+##  Deneysel Sonuçlar
 
 Proje kapsamında gerçekleştirilen deneylerde aşağıdaki sonuçlar elde edilmiştir:
 
@@ -157,7 +157,7 @@ Bu sonuçlar, geliştirilen iki modülün ilgili deney koşullarındaki performa
 
 > **Değerlendirme notu:** mAP@50 ve sınıflandırma doğruluğu farklı performans ölçütleridir. Bu değerler doğrudan birbirleriyle karşılaştırılmamalıdır.
 
-## 🛠️ Kullanılan Teknolojiler
+##  Kullanılan Teknolojiler
 
 | Alan                      | Teknolojiler                |
 | ------------------------- | --------------------------- |
@@ -173,7 +173,7 @@ Bu sonuçlar, geliştirilen iki modülün ilgili deney koşullarındaki performa
 | Grafikler                 | fl_chart                    |
 | Veri işleme               | NumPy, Pandas               |
 
-## 📁 Proje Yapısı
+##  Proje Yapısı
 
 ```text
 akilli-gozetim-sistemi/
@@ -198,7 +198,7 @@ akilli-gozetim-sistemi/
 
 **Not:** Eğitilmiş model dosyaları (`.pt`, `.keras` vb.) ve gerçek ortam değişkenlerini içeren `.env` dosyası Git deposuna eklenmemiştir. Model dosyalarının, projeyi yerel ortamda çalıştırmadan önce uygun konumlara yerleştirilmesi gerekir.
 
-## ⚙️ Kurulum
+##  Kurulum
 
 ### Gereksinimler
 
@@ -310,7 +310,7 @@ flutter run -d chrome --dart-define=API_TOKEN=KENDI_TOKEN_DEGERINIZ
 
 **Bağlantı notu:** Mevcut Flutter yapılandırmasında `localhost:8000` adresi kullanılıyorsa frontend ve backend aynı bilgisayarda çalışmalıdır. Uzak sunucuya dağıtım için WebSocket adresinin ayrıca yapılandırılması gerekir. Flutter Web uygulamalarında istemciye verilen token gizli tutulamaz; bu nedenle üretim ortamlarında erişim denetimi ve kimlik doğrulama tasarımı ayrıca ele alınmalıdır.
 
-## 🔐 Güvenlik ve Gizlilik
+##  Güvenlik ve Gizlilik
 
 * `.env` dosyası `.gitignore` ile Git takibinin dışında tutulur.
 * Eğitilmiş model dosyaları (`.pt`, `.keras`, `.h5`, `.onnx` vb.) depoya eklenmez.
@@ -319,7 +319,7 @@ flutter run -d chrome --dart-define=API_TOKEN=KENDI_TOKEN_DEGERINIZ
 * Gerçek ortamlarda HTTPS/WSS, güvenli kimlik doğrulama, erişim yetkilendirmesi ve uygun CORS politikaları kullanılmalıdır.
 * Kamera görüntüleri ve güvenlik kayıtları işlenirken ilgili gizlilik ve veri koruma gerekliliklerine uyulmalıdır.
 
-## 🚧 Sınırlılıklar ve Gelecek Çalışmalar
+##  Sınırlılıklar ve Gelecek Çalışmalar
 
 Sistemin daha geniş kullanım senaryolarına uyarlanabilmesi için aşağıdaki geliştirmeler değerlendirilebilir:
 
@@ -328,12 +328,11 @@ Sistemin daha geniş kullanım senaryolarına uyarlanabilmesi için aşağıdaki
 * Saldırı sınıflandırma performansının iyileştirilmesi
 * Gerçek zamanlı performans ve gecikme ölçümlerinin yapılması
 * Yanlış pozitif ve yanlış negatif tespitlerin analiz edilmesi
-* Model çıkarım süresinin ve kaynak tüketiminin ölçülmesi
 * Operatör bildirim mekanizmasının ve olay geçmişinin geliştirilmesi
 * Kimlik doğrulama ve dağıtım güvenliğinin güçlendirilmesi
 
 
-## 👩‍💻 Geliştirici
+##  Geliştirici
 
 **FeyzaSultanYüceer**
 
