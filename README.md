@@ -2,100 +2,142 @@
 
 ### TÜBİTAK 2209-A Destekli Bitirme Projesi
 
-Gerçek zamanlı güvenlik kamerası görüntülerini analiz ederek tehlikeli nesneleri ve şüpheli davranışları tespit etmeyi amaçlayan, bilgisayarlı görü ve derin öğrenme tabanlı hibrit bir akıllı gözetim sistemi.
+Gerçek zamanlı güvenlik kamerası görüntülerini analiz ederek tehlikeli nesneleri tespit etmeyi, nesnelerin görüntü içerisindeki hareketlerini takip etmeyi ve saldırı davranışlarını sınıflandırmayı amaçlayan yapay zekâ tabanlı hibrit bir akıllı gözetim sistemi.
 
 <p align="center">
-  <strong>Computer Vision</strong> · <strong>Deep Learning</strong> · <strong>YOLO</strong> · <strong>LSTM</strong> · <strong>Flutter</strong> · <strong>FastAPI</strong>
+  <strong>Computer Vision</strong> ·
+  <strong>Deep Learning</strong> ·
+  <strong>YOLO</strong> ·
+  <strong>CSRT Tracking</strong> ·
+  <strong>LSTM</strong> ·
+  <strong>FastAPI</strong> ·
+  <strong>Flutter</strong>
 </p>
 
 ---
 
 ##  Proje Hakkında
 
-Geleneksel güvenlik sistemleri çoğunlukla kamera görüntülerinin insan operatörler tarafından sürekli izlenmesine dayanır. Bu yaklaşım, uzun süreli izleme sırasında dikkat kaybına ve kritik olayların geç fark edilmesine neden olabilir.
+Geleneksel güvenlik sistemlerinde kamera görüntülerinin sürekli olarak insanlar tarafından izlenmesi gerekebilir. Uzun süreli izleme, dikkat kaybına ve kritik olayların geç fark edilmesine neden olabilir.
 
-Bu proje kapsamında, güvenlik kamerası görüntülerini gerçek zamanlı analiz ederek potansiyel tehditleri otomatik olarak tespit etmeyi amaçlayan **Yapay Zekâ Tabanlı Hibrit Akıllı Gözetim Sistemi** geliştirilmiştir.
+Bu proje kapsamında, güvenlik kamerası görüntülerini gerçek zamanlı analiz ederek potansiyel tehditlerin belirlenmesine yardımcı olan **Yapay Zekâ Tabanlı Hibrit Akıllı Gözetim Sistemi** geliştirilmiştir.
 
-Sistem, nesne tespiti ve davranış analizi modüllerini bir araya getirir. Python tabanlı yapay zekâ altyapısı, FastAPI üzerinden Flutter arayüzüyle haberleşir. Böylece tespit edilen tehditlerin operatör ekranında görüntülenmesi ve olayların takip edilmesi hedeflenir.
+Sistem, iki temel yapay zekâ modülünü bir araya getirir:
+
+* **Tehlikeli nesne tespiti ve hedef takibi:** YOLOv5m ile silah ve bıçak gibi nesnelerin tespit edilmesi; OpenCV CSRT takip algoritması ve IoU tabanlı eşleştirme ile tespit edilen nesnelerin görüntü içerisindeki takibinin sürdürülmesi.
+* **Saldırı davranışı analizi:** YOLOv8n-Pose ile insan vücudunun iskelet anahtar noktalarının çıkarılması ve LSTM ile ardışık karelerdeki hareket örüntülerinin analiz edilmesi.
+
+Python tabanlı backend, yapay zekâ modellerinin sonuçlarını işler ve WebSocket üzerinden Flutter arayüzüne iletir. Flutter uygulaması ise tehdit bilgilerinin, olayların ve sistem durumunun operatör tarafından takip edilebilmesini sağlar.
 
 Proje, **TÜBİTAK 2209-A Üniversite Öğrencileri Araştırma Projeleri Destekleme Programı** kapsamında desteklenmiştir.
 
 ##  Projenin Amaçları
 
-* Güvenlik kamerası görüntülerinden tehlikeli nesneleri tespit etmek.
-* İnsanların iskelet ve hareket bilgilerini analiz ederek saldırı davranışlarını sınıflandırmak.
-* Görüntü işleme ve derin öğrenme yöntemlerini tek bir hibrit sistemde birleştirmek.
-* Tespit edilen tehditleri operatör arayüzüne gerçek zamanlı olarak iletmek.
-* Güvenlik operatörlerinin olayları daha hızlı değerlendirmesine yardımcı olmak.
-* İnsan gözetimine duyulan bağımlılığı azaltmaya yönelik bir prototip geliştirmek.
+* Güvenlik kamerası görüntülerinde silah ve bıçak gibi tehlikeli nesneleri tespit etmek.
+* Tespit edilen nesnelerin görüntü içerisindeki konumlarını takip etmek.
+* IoU tabanlı eşleştirme ile yeni nesne tespitlerini mevcut takiplerle ilişkilendirmek.
+* İnsan iskelet anahtar noktalarından hareket özellikleri çıkararak saldırı davranışlarını sınıflandırmak.
+* Nesne tespiti, nesne takibi ve davranış analizini hibrit bir mimaride birleştirmek.
+* Yapay zekâ modellerinin sonuçlarını gerçek zamanlı olarak operatör arayüzüne aktarmak.
+* Tehditlerin daha hızlı değerlendirilmesine yardımcı olan bir prototip geliştirmek.
 
 ##  Sistem Mimarisi
 
-Sistem iki temel yapay zekâ modülünden ve bu modüllerle iletişim kuran bir yazılım altyapısından oluşur.
+Sistem; nesne tespiti ve takibi, saldırı davranışı analizi, backend iletişimi ve Flutter tabanlı operatör arayüzünden oluşur.
 
 ```text
-              GÜVENLİK KAMERASI
-                      │
-                      ▼
-             GERÇEK ZAMANLI GÖRÜNTÜ
-                      │
-             ┌────────┴────────┐
-             ▼                 ▼
-     NESNE TESPİTİ       DAVRANIŞ ANALİZİ
-       YOLOv5m             YOLO-Pose
-             │                 │
-     Silah / Bıçak       İskelet Anahtar
-         Tespiti          Noktaları (17)
-             │                 │
-             │                 ▼
-             │           Zamansal Özellikler
-             │                 │
-             │                 ▼
-             │                LSTM
-             │                 │
-             │          Saldırı Sınıflandırma
-             │                 │
-             └────────┬────────┘
-                      ▼
-               TEHDİT DEĞERLENDİRME
-                      │
-                      ▼
-               PYTHON + FASTAPI
-                      │
-                   WebSocket
-                      │
-                      ▼
-                FLUTTER ARAYÜZÜ
-                      │
-                      ▼
-             OPERATÖR BİLDİRİMİ
+                    GÜVENLİK KAMERASI
+                            │
+                            ▼
+                  GERÇEK ZAMANLI GÖRÜNTÜ
+                            │
+                ┌───────────┴───────────┐
+                ▼                       ▼
+        NESNE TESPİTİ             DAVRANIŞ ANALİZİ
+          YOLOv5m                  YOLOv8n-Pose
+                │                       │
+                ▼                       ▼
+        Silah / Bıçak             17 İskelet Anahtar
+            Tespiti                 Noktası
+                │                       │
+                ▼                       ▼
+        OpenCV CSRT               34 Koordinat
+          Takibi                  Özellik Vektörü
+                │                       │
+                ▼                       ▼
+        IoU Tabanlı                 Zamansal Dizi
+         Eşleştirme                      │
+                │                       ▼
+                ▼                      LSTM
+         Hedef Takibi                    │
+                │                       ▼
+                │                Saldırı Sınıflandırma
+                │                       │
+                └───────────┬───────────┘
+                            ▼
+                     TEHDİT BİLGİLERİ
+                            │
+                            ▼
+                    PYTHON + FASTAPI
+                            │
+                        WebSocket
+                            │
+                            ▼
+                     FLUTTER ARAYÜZÜ
+                            │
+                            ▼
+              Gerçek Zamanlı İzleme ve
+                  Operatör Bildirimleri
 ```
 
-*Not: Diyagram, sistemin kavramsal işleyişini göstermektedir. Gerçek çalışma akışı, uygulamadaki entegrasyon ve tehdit değerlendirme mantığına bağlıdır.*
+*Not: Diyagram, sistemin temel bileşenlerini ve aralarındaki iletişimi kavramsal olarak göstermektedir.*
 
 ##  Temel Modüller
 
-### 1. Tehlikeli Nesne Tespiti
+### 1. Tehlikeli Nesne Tespiti ve Hedef Takibi
 
-Güvenlik kamerası görüntülerinde silah ve bıçak gibi tehlikeli nesnelerin tespit edilmesi için YOLO tabanlı nesne tespit yaklaşımı kullanılmıştır.
+Sistemin nesne tespiti modülünde, güvenlik kamerası görüntülerinde silah ve bıçak gibi tehlikeli nesnelerin belirlenmesi amacıyla YOLOv5m modeli kullanılmaktadır.
+
+Tespit edilen nesnelerin yalnızca tek bir karede belirlenmesiyle yetinilmez. OpenCV'nin CSRT takip algoritması ve IoU tabanlı eşleştirme mekanizması kullanılarak nesnelerin sonraki karelerdeki konumları takip edilmeye çalışılır.
 
 **Kullanılan teknolojiler:**
 
 * YOLOv5m
 * OpenCV
+* CSRT Object Tracking
+* Intersection over Union (IoU)
 * PyTorch
 * Python
 
-**Modülün işlevleri:**
+**Çalışma prensibi:**
 
-* Kamera görüntülerinin gerçek zamanlı işlenmesi
-* Tehlikeli nesnelerin tespit edilmesi
-* Tespit sonuçlarının sınıf ve güven skoru ile değerlendirilmesi
-* Tehdit içeren görüntülerin arayüze aktarılmasına altyapı sağlanması
+1. Kamera görüntüsü YOLOv5m modeline iletilir.
+2. Model, belirlenen güven eşiğini karşılayan tehlikeli nesne tespitlerini üretir.
+3. Tespit edilen nesnelerin sınıf bilgileri ve sınırlayıcı kutu koordinatları alınır.
+4. OpenCV CSRT takip algoritması, nesnelerin görüntü içerisindeki konumlarını ardışık karelerde izler.
+5. Yeni YOLO tespitleri ile mevcut takipler IoU değerleri üzerinden karşılaştırılır.
+6. IoU eşik değerini karşılayan eşleşmelerde takip kutusu güncellenir ve nesne etiketi korunur.
+7. Bir nesne yeterli süre yeniden tespit edilemezse ilgili takip kaydı sistemden kaldırılır.
+
+**Hedef kilitleme ve takip mekanizması:**
+
+Sistemdeki hedef kilitleme yaklaşımı, tespit edilen nesnenin görüntü içerisindeki konumunu takip etmeye dayanır. IoU, iki sınırlayıcı kutunun kesişim alanının birleşim alanına oranını hesaplayarak yeni tespit ile mevcut takip arasındaki örtüşmeyi değerlendirir.
+
+Mevcut kodda kullanılan temel yapılandırmalar şunlardır:
+
+| Parametre           | Değer | Açıklama                                                              |
+| ------------------- | ----: | --------------------------------------------------------------------- |
+| YOLO güven eşiği    |  0,60 | Nesne tespitlerinde kullanılan minimum güven değeri                   |
+| IoU eşik değeri     |  0,25 | Yeni tespit ile mevcut takip arasında eşleştirme için kullanılan eşik |
+| Kayıp tespit sınırı |    15 | Takibin kaldırılmasından önce kullanılan kayıp tespit sayısı          |
+
+Takip edilen nesneler, görüntü üzerinde sınırlayıcı kutular ve `[TAKIP]` etiketiyle görselleştirilir.
+
+> **Önemli:** Buradaki hedef kilitleme, bilgisayarlı görü kapsamında görüntü içerisindeki nesnenin tespit edilmesi ve takibinin sürdürülmesi anlamına gelir. Fiziksel bir silahı, aracı veya başka bir platformu yönlendiren mekanik bir kilitleme sistemi değildir. CSRT takibi ile YOLO tespitleri birbirini destekler; takip performansı nesnenin görünürlüğüne, hareketine ve görüntü koşullarına bağlıdır.
 
 ### 2. Saldırı Davranışı Analizi
 
-İnsan hareketlerinin zamansal özelliklerini analiz ederek saldırı davranışlarını sınıflandırmak amacıyla YOLO-Pose ve LSTM modelleri bir arada kullanılmıştır.
+Saldırı davranışı analizi modülünde, insan vücudunun iskelet anahtar noktalarından çıkarılan zamansal özellikler LSTM modeliyle değerlendirilir.
 
 **Kullanılan teknolojiler:**
 
@@ -103,59 +145,111 @@ Güvenlik kamerası görüntülerinde silah ve bıçak gibi tehlikeli nesnelerin
 * LSTM
 * TensorFlow / Keras
 * NumPy
+* Pandas
 * Python
 
 **Çalışma prensibi:**
 
-1. YOLO-Pose ile görüntüdeki kişilerin iskelet anahtar noktaları tespit edilir.
-2. COCO formatındaki 17 vücut anahtar noktasının normalize edilmiş X ve Y koordinatları çıkarılır.
-3. Her kişi için toplam 34 koordinat değerinden oluşan özellik vektörleri hazırlanır.
-4. Ardışık karelerden elde edilen özellikler zamansal diziler hâline getirilir.
-5. LSTM modeli, hareketlerin zaman içindeki değişimini analiz ederek saldırı davranışını sınıflandırır.
+1. YOLOv8n-Pose modeliyle görüntüdeki kişilerin vücut anahtar noktaları çıkarılır.
+2. COCO formatındaki 17 iskelet anahtar noktasının normalize edilmiş X ve Y koordinatları alınır.
+3. Her kişi için 34 koordinat değerinden oluşan özellik vektörü hazırlanır.
+4. Ardışık karelerden elde edilen özellikler zaman sırasına göre bir araya getirilir.
+5. LSTM modeli, 30 zaman adımından oluşan hareket dizisini değerlendirerek saldırı davranışını sınıflandırır.
+6. Modelin tahmin skoru, belirlenen eşik değerine göre değerlendirilir.
 
-Bu yaklaşım, tek bir karedeki görüntü özelliklerinin yanı sıra hareketin zamansal örüntülerini de değerlendirmeyi amaçlar.
+Bu yaklaşım, tek bir görüntü karesini değerlendirmek yerine vücut hareketlerinin zaman içerisindeki değişimini de dikkate alır.
 
-### 3. Gerçek Zamanlı İletişim ve Operatör Arayüzü
+**Davranış analizi için kullanılan temel parametreler:**
 
-Yapay zekâ modellerinin sonuçları Python tabanlı backend üzerinden Flutter arayüzüne iletilir.
+| Parametre            |            Değer | Açıklama                                                |
+| -------------------- | ---------------: | ------------------------------------------------------- |
+| Poz modeli           |     YOLOv8n-Pose | İskelet anahtar noktalarının çıkarılması                |
+| Anahtar nokta sayısı |               17 | COCO vücut iskeleti anahtar noktaları                   |
+| Özellik boyutu       |               34 | Her anahtar nokta için X ve Y koordinatları             |
+| Dizi uzunluğu        |               30 | LSTM modeline verilen ardışık özellik sayısı            |
+| Poz işleme aralığı   | Her 2 karede bir | Poz çıkarımı için kullanılan kare atlama yapılandırması |
+| Saldırı skoru eşiği  |             0,60 | Alarm değerlendirmesinde kullanılan eşik                |
 
-**Backend:**
+### 3. Gerçek Zamanlı Backend ve İletişim
+
+Backend, kamera görüntülerinin işlenmesini, yapay zekâ modellerinin çalıştırılmasını ve sonuçların Flutter uygulamasına iletilmesini sağlar.
+
+**Kullanılan teknolojiler:**
 
 * Python
 * FastAPI
 * WebSocket
 * OpenCV
-* JSON tabanlı veri aktarımı
+* JSON
+* Base64
 
-**Frontend:**
+**Temel işlevler:**
+
+* Kamera görüntülerinin alınması ve işlenmesi
+* Nesne tespiti ve takip sonuçlarının oluşturulması
+* Saldırı davranışı analizinin yürütülmesi
+* Tehdit bilgilerinin WebSocket üzerinden aktarılması
+* Tehdit anına ait görüntünün JPEG biçiminde hazırlanarak Base64 ile iletilmesi
+* İstemci bağlantısının yönetilmesi
+
+Backend, tehdit görüntüsünü aktarırken görüntüyü 640 × 360 boyutlarına küçültür ve JPEG sıkıştırması uygular. Bu yaklaşım, WebSocket üzerinden iletilen görüntü verisinin boyutunu azaltmayı amaçlar.
+
+Flutter uygulaması, backend'den gelen JSON verilerini işleyerek ilgili bilgileri arayüzde gösterir.
+
+### 4. Flutter Operatör Arayüzü
+
+Sistemin operatör arayüzü Flutter ve Dart kullanılarak geliştirilmiştir. Arayüz, yapay zekâ modüllerinden elde edilen sonuçların operatör tarafından takip edilebilmesini ve sistem durumunun tek bir ekran üzerinden izlenebilmesini amaçlar.
+
+**Kullanılan teknolojiler:**
 
 * Flutter
 * Dart
-* WebSocket iletişimi
-* fl_chart ile grafikler
-* Gerçek zamanlı olay ve tehdit gösterimi
+* WebSocket
+* `web_socket_channel`
+* `fl_chart`
+* `intl`
+* JSON veri işleme
 
-Backend, kamera görüntülerini işleyerek tespit sonuçlarını üretir ve WebSocket üzerinden istemciye iletir. Flutter arayüzü ise gelen olayların operatör tarafından takip edilmesini sağlar.
+**Arayüzün temel işlevleri:**
 
-Arayüzde tehdit bilgileri, olay kayıtları ve sistem durumunun görselleştirilmesi hedeflenmiştir.
+* **Gerçek zamanlı veri iletişimi:** Backend'den WebSocket üzerinden gelen olay ve tehdit bilgilerinin alınması.
+* **Tehdit gösterimi:** Silah, bıçak ve saldırı davranışı gibi tehdit sınıflarına ilişkin bilgilerin arayüzde sunulması.
+* **Tehdit görüntüsünün gösterilmesi:** Backend tarafından Base64 biçiminde gönderilen tehdit karesinin çözülerek görüntülenmesi.
+* **Sistem modu yönetimi:** Yarı otonom ve tam otonom çalışma modlarını temsil eden arayüz seçeneklerinin kullanılması.
+* **Risk seviyelerinin gösterimi:** Düşük, orta, yüksek ve kritik gibi risk seviyelerinin görsel olarak ayrıştırılması.
+* **Olayların izlenmesi:** Tespit edilen olayların ve tehdit bilgilerinin operatör tarafından takip edilebilmesi.
+* **Grafiklerle görselleştirme:** `fl_chart` kütüphanesi üzerinden desteklenen grafiklerin oluşturulması.
+* **Bağlantı yönetimi:** WebSocket bağlantısının izlenmesi ve bağlantı kesildiğinde yeniden bağlanma mekanizmasının kullanılması.
+
+**WebSocket iletişim akışı:**
+
+1. Flutter uygulaması backend'in WebSocket uç noktasına bağlanır.
+2. Backend tarafından gönderilen JSON mesajları alınır.
+3. Gelen mesajlar Dart tarafında çözümlenir.
+4. Tehdit bilgileri, olay verileri ve varsa tehdit görüntüsü arayüzün ilgili bileşenlerine aktarılır.
+5. Bağlantı kesilirse uygulama, tanımlanan yeniden bağlanma mekanizmasıyla bağlantıyı tekrar kurmayı dener.
+
+Arayüzde kullanılan renkler ve görsel bileşenler, farklı tehdit ve risk seviyelerinin operatör tarafından daha kolay ayırt edilmesine yardımcı olacak şekilde tasarlanmıştır.
+
+*Not: Arayüzdeki işlevlerin kullanılabilirliği, ilgili bileşenlerin backend ve frontend kodundaki mevcut entegrasyonuna bağlıdır. Yarı otonom ve tam otonom mod adları, tek başına sistemin fiziksel bir cihazı otonom biçimde kontrol ettiği anlamına gelmez.*
 
 ##  Deneysel Sonuçlar
 
 Proje kapsamında gerçekleştirilen deneylerde aşağıdaki sonuçlar elde edilmiştir:
 
-| Modül                           | Model / Yöntem   |                       Sonuç |
-| ------------------------------- | ---------------- | --------------------------: |
-| Tehlikeli nesne tespiti         | YOLOv5m          |                %88,1 mAP@50 |
-| Saldırı davranışı sınıflandırma | YOLO-Pose + LSTM | %73 sınıflandırma doğruluğu |
+| Modül                           | Model / Yöntem      |                       Sonuç |
+| ------------------------------- | ------------------- | --------------------------: |
+| Tehlikeli nesne tespiti         | YOLOv5m             |                %88,1 mAP@50 |
+| Saldırı davranışı sınıflandırma | YOLOv8n-Pose + LSTM | %73 sınıflandırma doğruluğu |
 
 ### Sonuçların Değerlendirilmesi
 
-* **Tehlikeli nesne tespiti:** YOLOv5m modeliyle silah ve bıçak tespitine yönelik deneylerde %88,1 mAP@50 sonucu elde edilmiştir.
-* **Davranış analizi:** YOLO-Pose ile çıkarılan iskelet özelliklerinin LSTM modeliyle zamansal analizi sonucunda saldırı davranışı sınıflandırmasında %73 doğruluk elde edilmiştir.
+* **Tehlikeli nesne tespiti:** YOLOv5m ile silah ve bıçak tespitine yönelik deneylerde %88,1 mAP@50 sonucu elde edilmiştir.
+* **Saldırı davranışı analizi:** YOLOv8n-Pose ile çıkarılan iskelet özelliklerinin LSTM ile zamansal analizi sonucunda %73 sınıflandırma doğruluğu elde edilmiştir.
 
-Bu sonuçlar, geliştirilen iki modülün ilgili deney koşullarındaki performansını göstermektedir. Gerçek saha performansı; kamera açısı, aydınlatma, nesne boyutu, örtülme, hareket çeşitliliği ve veri setinin temsil gücü gibi faktörlerden etkilenebilir.
+Bu sonuçlar, ilgili modüllerin gerçekleştirilen deneyler kapsamındaki performansını göstermektedir. Gerçek ortamlardaki performans; kamera açısı, aydınlatma, nesne boyutu, örtülme, hareket çeşitliliği ve veri setinin temsil gücü gibi faktörlerden etkilenebilir.
 
-> **Değerlendirme notu:** mAP@50 ve sınıflandırma doğruluğu farklı performans ölçütleridir. Bu değerler doğrudan birbirleriyle karşılaştırılmamalıdır.
+> **Ölçüm notu:** mAP@50 ve sınıflandırma doğruluğu farklı performans ölçütleridir. Bu değerler doğrudan birbiriyle karşılaştırılmamalıdır. Ayrıca nesne takip modülünün başarısı, nesne tespiti mAP değerinden ayrı olarak değerlendirilmelidir.
 
 ##  Kullanılan Teknolojiler
 
@@ -163,20 +257,23 @@ Bu sonuçlar, geliştirilen iki modülün ilgili deney koşullarındaki performa
 | ------------------------- | --------------------------- |
 | Programlama dilleri       | Python, Dart                |
 | Nesne tespiti             | YOLOv5m                     |
+| Nesne takibi              | OpenCV CSRT                 |
+| Nesne eşleştirme          | IoU                         |
 | Poz tahmini               | YOLOv8n-Pose                |
 | Zamansal davranış analizi | LSTM                        |
 | Derin öğrenme             | PyTorch, TensorFlow / Keras |
 | Görüntü işleme            | OpenCV                      |
-| Backend API               | FastAPI                     |
+| Backend                   | FastAPI                     |
 | Gerçek zamanlı iletişim   | WebSocket                   |
 | Kullanıcı arayüzü         | Flutter                     |
 | Grafikler                 | fl_chart                    |
 | Veri işleme               | NumPy, Pandas               |
+| Ortam değişkenleri        | python-dotenv               |
 
 ##  Proje Yapısı
 
 ```text
-akilli-gozetim-sistemi/
+Yapayzeka-Tabanli-Hibrit-Akilli-Gozetim-Sistemi/
 │
 ├── flutter_app/
 │   ├── lib/
@@ -196,20 +293,19 @@ akilli-gozetim-sistemi/
 └── .gitignore
 ```
 
-**Not:** Eğitilmiş model dosyaları (`.pt`, `.keras` vb.) ve gerçek ortam değişkenlerini içeren `.env` dosyası Git deposuna eklenmemiştir. Model dosyalarının, projeyi yerel ortamda çalıştırmadan önce uygun konumlara yerleştirilmesi gerekir.
+**Önemli:** Eğitilmiş model dosyaları (`.pt`, `.keras` vb.) ve gerçek ortam değişkenlerini içeren `.env` dosyası Git deposuna eklenmemiştir. Modeller, uygulamanın çalışabilmesi için yerel ortamda beklenen dosya adları ve konumlarıyla sağlanmalıdır.
 
-##  Kurulum
+## ⚙️ Kurulum
 
 ### Gereksinimler
 
 * Python
 * Flutter SDK
-* Dart SDK (Flutter ile birlikte gelir)
 * Git
-* Bilgisayarda kullanılabilir bir kamera
+* Uygun bir kamera
 * Projede kullanılan eğitilmiş model dosyaları
 
-Kütüphane sürümleri, işletim sistemi ve donanım özellikleri çalıştırma ortamını etkileyebilir.
+İşletim sistemi, donanım ve bağımlılık sürümleri çalıştırma ortamını etkileyebilir.
 
 ### 1. Depoyu klonlayın
 
@@ -218,21 +314,19 @@ git clone https://github.com/fyuceer/Yapayzeka-Tabanli-Hibrit-Akilli-Gozetim-Sis
 cd Yapayzeka-Tabanli-Hibrit-Akilli-Gozetim-Sistemi
 ```
 
-### 2. Python ortamını hazırlayın
-
-Proje ana klasöründeyken sanal ortam oluşturun:
+### 2. Python sanal ortamını oluşturun
 
 ```bash
 python -m venv .venv
 ```
 
-Windows üzerinde sanal ortamı etkinleştirin:
+Windows PowerShell:
 
 ```powershell
 .venv\Scripts\Activate.ps1
 ```
 
-CMD kullanıyorsanız:
+Windows CMD:
 
 ```cmd
 .venv\Scripts\activate.bat
@@ -254,13 +348,13 @@ Windows CMD:
 copy .env.example .env
 ```
 
-`.env` dosyasını açarak `API_TOKEN` değişkenine kendi token değerinizi girin:
+`.env` dosyasını açarak kendi token değerinizi girin:
 
 ```env
 API_TOKEN=KENDI_TOKEN_DEGERINIZ
 ```
 
-Gerçek token'ınızı GitHub'a yüklemeyin veya herkese açık biçimde paylaşmayın.
+Gerçek token değerlerini kaynak kodlara eklemeyin veya herkese açık depolarda paylaşmayın.
 
 ### 4. Model dosyalarını yerleştirin
 
@@ -275,23 +369,21 @@ python_backend/
 └── en_iyi_saldiri_modeli.keras
 ```
 
-Model dosyalarının projede belirtilen adlarla ve beklenen konumlarda bulunması gerekir.
+Model dosyalarının adları ve konumları backend kodundaki yapılandırmayla eşleşmelidir.
 
 ### 5. Backend'i başlatın
 
-Proje ana klasöründen:
+Proje ana dizinindeyken:
 
 ```bash
 python python_backend/hibrit.py
 ```
 
-Backend'in kullandığı kamera, model yolları ve ortam değişkenleri doğru yapılandırılmış olmalıdır.
-
-> **Not:** Bu komutun çalışması, `hibrit.py` dosyasındaki başlatma yapılandırmasının ve bağımlılıkların mevcut ortamla uyumlu olmasına bağlıdır.
+Kamera erişiminin, model dosyalarının, Python bağımlılıklarının ve `.env` yapılandırmasının doğru olduğundan emin olun.
 
 ### 6. Flutter bağımlılıklarını yükleyin
 
-Yeni bir terminal açarak Flutter klasörüne geçin:
+Yeni bir terminal açın ve Flutter klasörüne geçin:
 
 ```bash
 cd flutter_app
@@ -300,44 +392,49 @@ flutter pub get
 
 ### 7. Flutter uygulamasını başlatın
 
-Backend'in çalıştığından emin olduktan sonra, Flutter Web uygulamasını şu komutla başlatabilirsiniz:
+Backend'in çalıştığından emin olduktan sonra:
 
 ```bash
 flutter run -d chrome --dart-define=API_TOKEN=KENDI_TOKEN_DEGERINIZ
 ```
 
-`KENDI_TOKEN_DEGERINIZ` yerine `.env` dosyasındaki token ile aynı değeri kullanın.
+`KENDI_TOKEN_DEGERINIZ` yerine `.env` dosyasında yapılandırdığınız token değerini kullanın.
 
-**Bağlantı notu:** Mevcut Flutter yapılandırmasında `localhost:8000` adresi kullanılıyorsa frontend ve backend aynı bilgisayarda çalışmalıdır. Uzak sunucuya dağıtım için WebSocket adresinin ayrıca yapılandırılması gerekir. Flutter Web uygulamalarında istemciye verilen token gizli tutulamaz; bu nedenle üretim ortamlarında erişim denetimi ve kimlik doğrulama tasarımı ayrıca ele alınmalıdır.
+**Bağlantı notları:**
+
+* Frontend ve backend aynı bilgisayarda çalışıyorsa `localhost` adresi kullanılabilir.
+* Farklı cihazlarda çalıştırma veya uzaktan dağıtım için WebSocket adresi ve ağ yapılandırması düzenlenmelidir.
+* Flutter Web uygulamasına derleme sırasında verilen token istemci tarafında incelenebilir. Bu nedenle `--dart-define` kullanılması token'ı gizli tutmaya tek başına yetmez.
+* Üretim ortamlarında uygun kimlik doğrulama, erişim denetimi ve güvenli bağlantı yapılandırması kullanılmalıdır.
 
 ##  Güvenlik ve Gizlilik
 
-* `.env` dosyası `.gitignore` ile Git takibinin dışında tutulur.
-* Eğitilmiş model dosyaları (`.pt`, `.keras`, `.h5`, `.onnx` vb.) depoya eklenmez.
+* `.env` dosyası Git takibinin dışında tutulmalıdır.
+* Eğitilmiş model dosyaları, depo boyutunu ve dağıtım koşullarını yönetmek amacıyla Git deposuna eklenmemiştir.
 * Gerçek token değerleri kaynak kodlarda saklanmamalıdır.
-* Flutter Web uygulamasında kullanılan token'ın kullanıcı tarafından incelenebilir olabileceği dikkate alınmalıdır.
-* Gerçek ortamlarda HTTPS/WSS, güvenli kimlik doğrulama, erişim yetkilendirmesi ve uygun CORS politikaları kullanılmalıdır.
-* Kamera görüntüleri ve güvenlik kayıtları işlenirken ilgili gizlilik ve veri koruma gerekliliklerine uyulmalıdır.
+* İstemci tarafında kullanılan erişim bilgilerinin gizli kalacağı varsayılmamalıdır.
+* Gerçek ortamlarda HTTPS/WSS ve uygun kimlik doğrulama mekanizmaları değerlendirilmelidir.
+* Kamera görüntüleri ve güvenlik kayıtları işlenirken gizlilik ve veri koruma gerekliliklerine uyulmalıdır.
 
 ##  Sınırlılıklar ve Gelecek Çalışmalar
 
-Sistemin daha geniş kullanım senaryolarına uyarlanabilmesi için aşağıdaki geliştirmeler değerlendirilebilir:
+Sistemin daha geniş kullanım senaryolarına uyarlanması için aşağıdaki geliştirmeler değerlendirilebilir:
 
 * Farklı kamera açıları, aydınlatma koşulları ve kalabalık ortamlarda testlerin genişletilmesi
+* Nesne takip performansının kimlik sürekliliği, takip kaybı ve yeniden tespit ölçütleriyle değerlendirilmesi
 * Davranış analizi veri setinin çeşitlendirilmesi
 * Saldırı sınıflandırma performansının iyileştirilmesi
-* Gerçek zamanlı performans ve gecikme ölçümlerinin yapılması
-* Yanlış pozitif ve yanlış negatif tespitlerin analiz edilmesi
-* Operatör bildirim mekanizmasının ve olay geçmişinin geliştirilmesi
+* Gerçek zamanlı işlem hızı ve uçtan uca gecikmenin ölçülmesi
+* Yanlış pozitif ve yanlış negatif sonuçların analiz edilmesi
+* Operatör arayüzündeki olay geçmişi ve bildirim mekanizmalarının geliştirilmesi
 * Kimlik doğrulama ve dağıtım güvenliğinin güçlendirilmesi
-
 
 ##  Geliştirici
 
-**FeyzaSultanYüceer**
+**Feyza Sultan Yüceer**
 
 GitHub: [@fyuceer](https://github.com/fyuceer)
 
 ---
 
-*Bu proje, yapay zekâ ve bilgisayarlı görü yöntemlerinin akıllı güvenlik sistemlerinde kullanımını araştırmak ve gerçek zamanlı tehdit analizine yönelik bir prototip geliştirmek amacıyla hazırlanmıştır.*
+*Bu proje, yapay zekâ ve bilgisayarlı görü yöntemlerinin akıllı gözetim sistemlerinde kullanımını araştırmak ve gerçek zamanlı tehdit analizine yönelik hibrit bir prototip geliştirmek amacıyla hazırlanmıştır.*
